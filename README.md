@@ -30,7 +30,8 @@ project(':flipper').projectDir = new File('../flipper/')
 Now your project is ready to use this library
 
 ## Main Features
-Flipper provides :
+Flipper provides an abstaction layer to manage files using Uri access on Android platform.
+
  Example and how to use the library:
  ```java
         public class MainActivity extends Activity {
