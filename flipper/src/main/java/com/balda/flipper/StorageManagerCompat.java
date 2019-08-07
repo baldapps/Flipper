@@ -185,15 +185,6 @@ public class StorageManagerCompat {
         return null;
     }
 
-    /**
-     * Verify if we have access at least to one storage volume, i.e. if
-     * the user grants us at least one folder on external storage.
-     * @return True if at least one root exist, false otherwise
-     */
-    public boolean isAccessGranted() {
-        return roots.size() > 0;
-    }
-
     private void saveRoots(@NonNull Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         Set<String> toBeSaved = new HashSet<>();

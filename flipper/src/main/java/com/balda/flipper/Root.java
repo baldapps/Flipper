@@ -135,6 +135,13 @@ public class Root implements Parcelable, Comparable<Root> {
         }
     }
 
+    public boolean isAccessGranted(Context context) {
+        DocumentFile f = toRootDirectory(context);
+        if (f == null)
+            return false;
+        return f.canRead() && f.canWrite();
+    }
+
     static Root fromJson(String json) throws JSONException {
         JSONObject jsonObject = new JSONObject(json);
         Root root = new Root();

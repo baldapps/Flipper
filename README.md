@@ -18,7 +18,7 @@ git clone https://github.com/baldapps/Flipper.git
  * In the root of your application's project edit the file "settings.gradle" and add the following lines:
 ```shell
 include ':flipper'
-project(':flipper').projectDir = new File('../flipper/')
+project(':flipper').projectDir = new File('../Flipper/flipper')
 ```
  * In your application's main module (usually called "app"), edit your build.gradle to add a new dependency:
 ```shell
@@ -45,7 +45,7 @@ Flipper provides an abstaction layer to manage files using Uri access on Android
                manager = new StorageManagerCompat(this);
                if (!manager.isAccessGranted()) {
                     Intent i = manager.requireExternalAccess(this);
-                    startActivityResult(i, 100);
+                    startActivityForResult(i, 100);
                }
            }
         
@@ -82,12 +82,12 @@ Flipper provides an abstaction layer to manage files using Uri access on Android
                         DocumentFile subFolder = DocumentFileCompat.getSubFolder(f, "mysub");
                         DocumentFile myFile = DocumentFileCompat.getFile(subFolder, "myfile", "image/png");
                         try {
-                            OutputStream is = getContentResolver().openOutputStream(myFile.getUri());
+                            OutputStream os = getContentResolver().openOutputStream(myFile.getUri());
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }
                     } catch (OperationFailedException e) {
-                        e.printStaceTrace();
+                        e.printStackTrace();
                     }
                 }
            }
