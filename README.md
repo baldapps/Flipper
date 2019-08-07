@@ -43,7 +43,8 @@ Flipper provides an abstaction layer to manage files using Uri access on Android
                super.onCreate(savedInstanceState);
                setContentView(R.layout.activity_main);
                manager = new StorageManagerCompat(this);
-               if (!manager.isAccessGranted()) {
+               Root root = manager.getRoot(StorageManagerCompat.DEF_MAIN_ROOT);
+               if (root == null || !root.isAccessGranted(this)) {
                     Intent i = manager.requireExternalAccess(this);
                     startActivityForResult(i, 100);
                }
