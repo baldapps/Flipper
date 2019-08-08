@@ -49,6 +49,7 @@ public class StorageManagerCompat {
 
     private static final String PREF_ROOTS = "flipper.roots";
     public static final String DEF_MAIN_ROOT = "defroot";
+    public static final String DEF_SD_ROOT = "defsdcard";
     private Set<Root> roots = new HashSet<>();
 
     public StorageManagerCompat(@NonNull Context context) {

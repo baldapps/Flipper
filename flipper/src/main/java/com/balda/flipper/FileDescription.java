@@ -1,5 +1,7 @@
 package com.balda.flipper;
 
+import android.content.Context;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.webkit.MimeTypeMap;
@@ -7,16 +9,33 @@ import android.webkit.MimeTypeMap;
 import java.io.File;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.documentfile.provider.DocumentFile;
 
 @SuppressWarnings("unused")
 public class FileDescription implements Parcelable {
 
     private String name;
     private String mime;
+    @Nullable
+    private Uri uri;
 
     public FileDescription(@NonNull String name, @NonNull String mime) {
         this.name = name;
         this.mime = mime;
+    }
+
+    public FileDescription(@NonNull Context context, @NonNull Uri file) throws IllegalArgumentException {
+        //noinspection ConstantConditions
+        this(DocumentFile.fromSingleUri(context, file));
+    }
+
+    public FileDescription(@NonNull DocumentFile file) throws IllegalArgumentException {
+        if (!file.isFile())
+            throw new IllegalArgumentException();
+        this.name = file.getName();
+        this.mime = file.getType();
+        this.uri = file.getUri();
     }
 
     public FileDescription(@NonNull File file) {
@@ -34,6 +53,9 @@ public class FileDescription implements Parcelable {
     protected FileDescription(Parcel in) {
         name = in.readString();
         mime = in.readString();
+        if (in.readInt() == 1) {
+            uri = in.readParcelable(Uri.class.getClassLoader());
+        }
     }
 
     public static final Creator<FileDescription> CREATOR = new Creator<FileDescription>() {
@@ -66,6 +88,15 @@ public class FileDescription implements Parcelable {
             this.mime = mime;
     }
 
+    @Nullable
+    public Uri getUri() {
+        return uri;
+    }
+
+    public void setUri(@Nullable Uri uri) {
+        this.uri = uri;
+    }
+
     /**
      * It returns the name with extension according to mime type set
      *
@@ -87,5 +118,10 @@ public class FileDescription implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(name);
         parcel.writeString(mime);
+        if (uri != null) {
+            parcel.writeInt(1);
+            parcel.writeParcelable(uri, i);
+        } else
+            parcel.writeInt(0);
     }
 }
