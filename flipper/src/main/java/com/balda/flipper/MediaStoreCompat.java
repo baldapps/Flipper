@@ -31,7 +31,6 @@ import android.os.Environment;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.webkit.MimeTypeMap;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -55,9 +54,9 @@ public class MediaStoreCompat {
     /**
      * Create a new publisher
      *
-     * @param c  The content
-     * @param f  One of Directory defined in Environment class
-     * @param l  The operation listener
+     * @param c The content
+     * @param f One of Directory defined in Environment class
+     * @param l The operation listener
      */
     public MediaStoreCompat(@NonNull Context c, @NonNull String f, @NonNull MediaStoreCompatListener l) {
         context = c;
@@ -74,25 +73,25 @@ public class MediaStoreCompat {
         subFolder = sub;
     }
 
-    public void saveImage(@NonNull String name, @NonNull String mimeType) throws MediaStoreCompatException {
-        saveMedia(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, name, mimeType);
+    public void saveImage(@NonNull FileDescription description) throws MediaStoreCompatException {
+        saveMedia(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, description);
     }
 
-    public void saveVideo(@NonNull String name, @NonNull String mimeType) throws MediaStoreCompatException {
-        saveMedia(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, name, mimeType);
+    public void saveVideo(@NonNull FileDescription description) throws MediaStoreCompatException {
+        saveMedia(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, description);
     }
 
-    public void saveAudio(@NonNull String name, @NonNull String mimeType) throws MediaStoreCompatException {
-        saveMedia(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, name, mimeType);
+    public void saveAudio(@NonNull FileDescription description) throws MediaStoreCompatException {
+        saveMedia(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, description);
     }
 
-    private void saveMedia(Uri uri, String name, String mimeType) throws MediaStoreCompatException {
+    private void saveMedia(Uri uri, FileDescription description) throws MediaStoreCompatException {
         ContentResolver resolver = context.getContentResolver();
         OutputStream os;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
-            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, mimeType);
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, description.getName());
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, description.getMime());
             String imagesDir = folder;
             if (!TextUtils.isEmpty(subFolder)) {
                 imagesDir += File.separator + subFolder;
@@ -114,8 +113,7 @@ public class MediaStoreCompat {
             File extDir = Environment.getExternalStoragePublicDirectory(folder);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(Environment
-                        .getExternalStorageState(extDir))) {
+                if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(Environment.getExternalStorageState(extDir))) {
                     throw new MediaStoreCompatException("External storage not currently available");
                 }
             } else {
@@ -133,7 +131,7 @@ public class MediaStoreCompat {
                 //noinspection ResultOfMethodCallIgnored
                 path.mkdir();
             }
-            File image = new File(path, name + MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType));
+            File image = new File(path, description.getFullName());
             try {
                 os = new FileOutputStream(image);
             } catch (FileNotFoundException e) {
