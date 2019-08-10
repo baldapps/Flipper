@@ -103,6 +103,8 @@ public class FileDescription implements Parcelable {
      * @return The full name example myimage.png
      */
     public String getFullName() {
+        if (name.contains("."))
+            return name;
         String ext = MimeTypeMap.getSingleton().getExtensionFromMimeType(mime);
         if (ext != null)
             return name + "." + ext;
