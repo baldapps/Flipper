@@ -69,6 +69,7 @@ public class StorageManagerCompat {
 
     /**
      * It returns an intent to be dispatched via startActivityResult
+     *
      * @param context The context
      * @return Null if no permission is needed, the intent needed otherwise
      */
@@ -83,9 +84,6 @@ public class StorageManagerCompat {
         } else {
             return null;
         }
-        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        i.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        i.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
         return i;
     }
 
@@ -94,6 +92,7 @@ public class StorageManagerCompat {
      * the first removable no primary storage. This method requires at least Nougat
      * because on previous Android versions there's no reliable way to get the
      * volume/path of SdCard, and no, SdCard != External Storage.
+     *
      * @param context The context
      * @return Null if no storage is found, the intent object otherwise
      */
@@ -103,8 +102,8 @@ public class StorageManagerCompat {
         StorageManager sm = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
         if (sm == null)
             throw new UnsupportedOperationException();
-        List<StorageVolume> volumes =  sm.getStorageVolumes();
-        for (StorageVolume s : volumes)  {
+        List<StorageVolume> volumes = sm.getStorageVolumes();
+        for (StorageVolume s : volumes) {
             if (s.isRemovable()) {
                 Intent i;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -114,12 +113,7 @@ public class StorageManagerCompat {
                     if (s.isPrimary())
                         return null;
                     i = s.createAccessIntent(null);
-                    if (i == null)
-                        return null;
                 }
-                i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                i.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-                i.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
                 return i;
             }
         }
@@ -128,9 +122,10 @@ public class StorageManagerCompat {
 
     /**
      * Add a root to the repository
+     *
      * @param context The context
-     * @param name A generic name assigned to the root, ex. MyRoot
-     * @param file A file path
+     * @param name    A generic name assigned to the root, ex. MyRoot
+     * @param file    A file path
      * @return The root object
      */
     @Nullable
@@ -143,9 +138,10 @@ public class StorageManagerCompat {
 
     /**
      * Add a root to the repository
+     *
      * @param context The context
-     * @param name A generic name assigned to the root, ex. MyRoot
-     * @param data The intent returned in onActivityResult, see #requireExternalAccess
+     * @param name    A generic name assigned to the root, ex. MyRoot
+     * @param data    The intent returned in onActivityResult, see #requireExternalAccess
      * @return The root object
      */
     @Nullable
@@ -153,6 +149,9 @@ public class StorageManagerCompat {
         Uri uri = data.getData();
         if (uri == null)
             return null;
+        context.getContentResolver()
+                .takePersistableUriPermission(uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         Root r = new Root(name, uri);
         roots.add(r);
         saveRoots(context);
@@ -161,10 +160,11 @@ public class StorageManagerCompat {
 
     /**
      * Delete a root object. Root objects are deleted by name.
+     *
      * @param name The root name
      */
     public void deleteRoot(@NonNull final String name) {
-        for (Iterator<Root> i = roots.iterator(); i.hasNext();) {
+        for (Iterator<Root> i = roots.iterator(); i.hasNext(); ) {
             Root element = i.next();
             if (element.getName().equals(name)) {
                 i.remove();
@@ -174,6 +174,7 @@ public class StorageManagerCompat {
 
     /**
      * Get a root
+     *
      * @param name Get root with a specific name
      * @return The first root matching the predicate
      */
