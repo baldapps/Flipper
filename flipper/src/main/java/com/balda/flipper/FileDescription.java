@@ -39,14 +39,12 @@ public class FileDescription implements Parcelable {
     }
 
     public FileDescription(@NonNull File file) {
-        String fileName = file.getName();
-        int len = fileName.indexOf(".");
+        this.name = file.getName();
+        int len = name.indexOf(".");
         if (len == -1) {
-            this.name = fileName;
             this.mime = "*/*";
         } else {
-            this.name = fileName.substring(0, len);
-            this.mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileName.substring(len));
+            this.mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(name.substring(len));
         }
     }
 
