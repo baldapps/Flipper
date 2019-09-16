@@ -19,32 +19,41 @@ import androidx.documentfile.provider.DocumentFile;
 
 import static android.net.Uri.parse;
 
+@SuppressWarnings("unused")
 public class FileUtils {
 
     private FileUtils() {
     }
 
     @Nullable
-    public static DocumentFile getDocumentFile(Context context, Uri uri) {
+    public static DocumentFile getDocumentFile(Context context, Uri uri, Root root) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return DocumentFile.fromSingleUri(context, uri);
+            try {
+                return DocumentFile.fromSingleUri(context,
+                        DocumentsContract.buildDocumentUriUsingTree(root
+                        .toRootDirectory(context)
+                        .getUri(), DocumentsContract.getDocumentId(uri)));
+            } catch (Exception e) {
+                return null;
+            }
         } else {
             String path = getPath(context, uri);
-            if (path == null)
+            if (path == null) {
                 return null;
+            }
             return DocumentFile.fromFile(new File(path));
         }
     }
 
     @Nullable
-    public static DocumentFile getDocumentFile(Context context, String uri) {
-        return getDocumentFile(context, Uri.parse(uri));
+    public static DocumentFile getDocumentFile(Context context, String uri, Root root) {
+        return getDocumentFile(context, Uri.parse(uri), root);
     }
 
     private static String getPath(final Context context, final Uri uri) {
         try {
             // DocumentProvider
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && DocumentsContract.isDocumentUri(context, uri)) {
+            if (DocumentFile.isDocumentUri(context, uri)) {
                 // ExternalStorageProvider
                 if (isExternalStorageDocument(uri)) {
                     final String docId = DocumentsContract.getDocumentId(uri);

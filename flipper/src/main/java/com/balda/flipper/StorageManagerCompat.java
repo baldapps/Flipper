@@ -30,6 +30,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.storage.StorageManager;
 import android.os.storage.StorageVolume;
+import android.provider.DocumentsContract;
 
 import org.json.JSONException;
 
@@ -198,5 +199,46 @@ public class StorageManagerCompat {
             }
         }
         prefs.edit().putStringSet(PREF_ROOTS, toBeSaved).apply();
+    }
+
+    /**
+     * Utitly method to select root according to an uri
+     *
+     * @param context The context
+     * @param uri     The uri used to select the volume
+     * @return The root if exist or null
+     */
+    @Nullable
+    public Root getRoot(@NonNull Context context, Uri uri) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            StorageManager m = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
+            if (m == null || uri == null)
+                return null;
+            if (FileUtils.isMediaDocument(uri)) {
+                StorageVolume volume;
+                try {
+                    volume = m.getStorageVolume(uri);
+                } catch (Exception e) {
+                    return null;
+                }
+                if (volume.isPrimary()) {
+                    return getRoot(StorageManagerCompat.DEF_MAIN_ROOT);
+                } else if (volume.isRemovable()) {
+                    return getRoot(StorageManagerCompat.DEF_SD_ROOT);
+                } else
+                    return null;
+            } else {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                if (split.length <= 1)
+                    return null;
+                final String type = split[0];
+                if ("primary".equals(type))
+                    return getRoot(StorageManagerCompat.DEF_MAIN_ROOT);
+                else
+                    return getRoot(StorageManagerCompat.DEF_SD_ROOT);
+            }
+        } else
+            return getRoot(StorageManagerCompat.DEF_MAIN_ROOT);
     }
 }
