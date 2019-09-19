@@ -227,7 +227,7 @@ public class StorageManagerCompat {
                     return getRoot(StorageManagerCompat.DEF_SD_ROOT);
                 } else
                     return null;
-            } else {
+            } else if (DocumentsContract.isDocumentUri(context, uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
                 final String[] split = docId.split(":");
                 if (split.length <= 1)
@@ -238,7 +238,7 @@ public class StorageManagerCompat {
                 else
                     return getRoot(StorageManagerCompat.DEF_SD_ROOT);
             }
-        } else
-            return getRoot(StorageManagerCompat.DEF_MAIN_ROOT);
+        }
+        return getRoot(StorageManagerCompat.DEF_MAIN_ROOT);
     }
 }
