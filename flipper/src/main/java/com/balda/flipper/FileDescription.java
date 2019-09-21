@@ -25,14 +25,12 @@ public class FileDescription implements Parcelable {
         this.mime = mime;
     }
 
-    public FileDescription(@NonNull Context context, @NonNull Uri file) throws IllegalArgumentException {
+    public FileDescription(@NonNull Context context, @NonNull Uri file) {
         //noinspection ConstantConditions
         this(DocumentFile.fromSingleUri(context, file));
     }
 
-    public FileDescription(@NonNull DocumentFile file) throws IllegalArgumentException {
-        if (!file.isFile())
-            throw new IllegalArgumentException();
+    public FileDescription(@NonNull DocumentFile file) {
         this.name = file.getName();
         this.mime = file.getType();
         this.uri = file.getUri();
