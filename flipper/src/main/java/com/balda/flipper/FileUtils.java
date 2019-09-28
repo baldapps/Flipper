@@ -119,7 +119,7 @@ public class FileUtils {
      */
     private static String getDataColumn(Context context, Uri uri, String selection,
                                         String[] selectionArgs) {
-        final String column = "_data";
+        final String column = MediaStore.MediaColumns.DATA;
         final String[] projection = {column};
         try (Cursor cursor = context.getContentResolver()
                 .query(uri, projection, selection, selectionArgs, null)) {
